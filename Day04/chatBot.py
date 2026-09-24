@@ -1,0 +1,33 @@
+import ollama
+msgs = [
+   {
+      "role": "system",
+      "content": "give the answers like a rhymes."
+   }
+]
+while True:
+   question = input("You: ")
+   if question.lower() == "exit":
+      break
+   msgs.append(
+      {
+         "role": "user",
+         "content": question
+      }
+   )
+   response = ollama.chat(
+      model = "llama3.2:3b",
+      messages= msgs )
+   msgs.append(
+       {"role": "assistant",
+        "content": response["message"]["content"]
+       }
+   )
+        
+       
+    
+   print( "AI",response["message"]["content"])
+
+print("---Chat History---\n")
+for msg in msgs:
+   print(msg["role"],":",msg["content"])
