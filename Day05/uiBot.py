@@ -1,12 +1,33 @@
 import ollama
 import streamlit as st
-st.title("Welcome to my ChatBot App!!!")
+st.title("✨ Welcome to my ChatBot App!!! 🤖")
+st.set_page_config(
+    page_title="My ChatBot",
+    page_icon="🤖",
+    layout="wide"
+)
+st.markdown("### 🧠📚 Chat • Learn • Create • Explore ✨")
 with st.sidebar:
+   st.header= ("Chat Settings")
+   if st.button("Clear Chat🗑️"):
+      st.session_state.messages = []
+   personalities = {
+      "👶kid" : "Answer the questions like your are explaining to a 5 year old kid in two lines only",
+      "🫂Friend" :"Ans the questions in a friendly and casual manner. Give answer in two lines only",
+      "✍️Study assistant" : "Answer the question ",
+      "🧑‍🏫English Tutor" : " ",
+      "👑Story Generator" : ""
+   }
+   personality = st.selectbox("Select a personality",personalities.keys())
    uploaded_file = st.file_uploader("Upload a text file...")
-   if uploaded_file:
-      st.write("Uploaled file:",uploaded_file.name)
+   try:
+     if uploaded_file:
+      st.success("File uploaded successfully")
       content = uploaded_file.read().decode("utf-8")
-      st.text(content)
+      if st.button("Display"):
+        st.text(content)
+   except: 
+      st.error("File Type not supported🤦")     
 if "messages" not in st.session_state:
    st.session_state.messages = []
 for msg in st.session_state.messages:
@@ -22,12 +43,12 @@ if question:
     )
     with st.chat_message("user"):
       st.write(question)
-      with st.spinner("Thinking.."):
-        st.success("Done!")
-        st.button("Rerun")
-    response = ollama.chat(
+    with st.spinner("Wait, model is loading...🚀"):
+     response = ollama.chat(
         model = "llama3.2:3b",
-        messages= st.session_state.messages )
+        messages= [
+           {"role":"system", "content": personalities[personality]}]
+           + st.session_state.messages )
     st.session_state.messages.append(
         {"role": "assistant",
             "content": response["message"]["content"]
@@ -35,9 +56,6 @@ if question:
     ) 
     with st.chat_message("assistant"):
      ( "AI",response["message"]["content"])
-import time
 
-with st.spinner("Wait for it...", show_time=True):
-    time.sleep(5)
 
 
